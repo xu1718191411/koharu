@@ -10,6 +10,7 @@ mod minimax;
 mod openai;
 mod openai_compatible;
 mod openrouter;
+mod sarashina;
 
 use anyhow::Context;
 use futures::{FutureExt, future::BoxFuture, future::join_all};
@@ -28,6 +29,7 @@ pub use minimax::MiniMaxConfig;
 pub use openai::OpenAiConfig;
 pub use openai_compatible::OpenAiCompatibleConfig;
 pub use openrouter::OpenRouterConfig;
+pub use sarashina::SarashinaConfig;
 
 use crate::{
     Error, GenerationConfig, Model, ModelSelection, Provider, ProvidersConfig, Result,
@@ -88,6 +90,7 @@ pub(crate) async fn translate(
             google_cloud::translate(client, &providers.google_cloud_translation, request).await
         }
         Provider::Caiyun => caiyun::translate(client, &providers.caiyun, request).await,
+        Provider::Sarashina => sarashina::translate(client, &providers.sarashina, request).await,
         Provider::Local => unreachable!("local translation has its own backend"),
     }
 }
@@ -107,6 +110,7 @@ pub(crate) async fn models(client: &Client, providers: &ProvidersConfig) -> Vec<
         deepl::models().boxed(),
         google_cloud::models().boxed(),
         caiyun::models().boxed(),
+        sarashina::models().boxed(),
     ];
     for result in join_all(pending).await {
         append_models(&mut models, result);

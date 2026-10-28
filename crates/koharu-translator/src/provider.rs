@@ -8,7 +8,7 @@ use crate::{
     remote::{
         CaiyunConfig, ClaudeConfig, DeepLConfig, DeepSeekConfig, GeminiConfig, GoogleCloudConfig,
         GrokConfig, LmStudioConfig, MiniMaxConfig, OpenAiCompatibleConfig, OpenAiConfig,
-        OpenRouterConfig,
+        OpenRouterConfig, SarashinaConfig,
     },
 };
 
@@ -192,6 +192,12 @@ define_providers! {
         name: "Caiyun",
         field: caiyun,
         config: CaiyunConfig,
+    }
+    Sarashina {
+        id: "sarashina",
+        name: "Sarashina",
+        field: sarashina,
+        config: SarashinaConfig,
     }
 }
 
