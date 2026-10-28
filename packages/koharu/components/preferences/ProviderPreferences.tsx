@@ -5,6 +5,7 @@ import { useEffect, useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import {
+  NumberField,
   PreferencePage,
   PreferenceRow,
   PreferenceSection,
@@ -28,6 +29,7 @@ type ConfigWithSetting<T, Key extends PropertyKey> = T extends { settings: infer
   : never
 
 type BaseUrlConfig = ConfigWithSetting<ProviderConfig, 'base_url'>
+type RateLimitConfig = ConfigWithSetting<ProviderConfig, 'requests_per_minute'>
 
 export function ProviderPreferences({
   value,
@@ -74,6 +76,23 @@ export function ProviderPreferences({
                       }),
                     )
                   }
+                />
+              )}
+              {hasRateLimit(entry.config) && (
+                <NumberField
+                  label={t('model.requestsPerMinute')}
+                  value={entry.config.settings.requests_per_minute ?? null}
+                  min={1}
+                  step={1}
+                  onChange={(requests_per_minute) => {
+                    if (requests_per_minute === null || requests_per_minute < 1) return
+                    onChange(
+                      replaceEntry(value, {
+                        ...entry,
+                        config: withRateLimit(entry.config, Math.floor(requests_per_minute)),
+                      }),
+                    )
+                  }}
                 />
               )}
             </div>
@@ -157,6 +176,18 @@ function withBaseUrl(config: ProviderConfig, base_url: string): ProviderConfig {
   return {
     ...config,
     settings: { ...config.settings, base_url: base_url || null },
+  } as ProviderConfig
+}
+
+function hasRateLimit(config: ProviderConfig): config is RateLimitConfig {
+  return 'requests_per_minute' in config.settings
+}
+
+function withRateLimit(config: ProviderConfig, requests_per_minute: number): ProviderConfig {
+  if (!hasRateLimit(config)) return config
+  return {
+    ...config,
+    settings: { ...config.settings, requests_per_minute },
   } as ProviderConfig
 }
 

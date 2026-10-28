@@ -72,7 +72,10 @@ async fn main() -> Result<()> {
     if model.is_none()
         && !matches!(
             provider,
-            Provider::DeepL | Provider::GoogleCloudTranslation | Provider::Caiyun
+            Provider::DeepL
+                | Provider::GoogleCloudTranslation
+                | Provider::Caiyun
+                | Provider::Sarashina
         )
     {
         anyhow::bail!("--model is required for {provider}");
@@ -120,6 +123,7 @@ fn prepare_secret(args: &Args, provider: Provider) -> Result<()> {
         Provider::DeepL => Some(("DEEPL_API_KEY", true)),
         Provider::GoogleCloudTranslation => Some(("GOOGLE_CLOUD_API_KEY", true)),
         Provider::Caiyun => Some(("CAIYUN_API_KEY", true)),
+        Provider::Sarashina => Some(("SARASHINA_API_KEY", true)),
     }) else {
         return Ok(());
     };
